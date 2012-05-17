@@ -43,8 +43,11 @@ while (<>) {
     }
 
     #tidy problems
-    if (/^IOError:/) { print "\n$_"; next;}
+    if (/^IOError:/) { print "\n$_"; next; }
     if (/trailing whitespace/) { s/^[^ ]*?rust/rust/; print "\n$_"; next; }
+
+    #spanless errors
+    if (/.{0,6}error:/) { print "\n$_"; next; }
 
     print ".";
 }
