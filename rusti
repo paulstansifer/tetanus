@@ -1,0 +1,98 @@
+#/bin/bash
+
+# This requires rlwrap (`apt-get install rlwrap`), which is a serious 
+# quality-of-life improver anyways.
+
+if [[ "$RUST_EXE" = "" ]] ; then
+    echo '$RUST_EXE must be a command to run Rust.'
+    exit
+else
+    echo "Using the following rustc:"
+    echo '    ' $RUST_EXE
+fi
+
+
+
+get() {
+    rlwrap -pyellow -S "$1> " -P "$2" -o cat > /tmp/rusti_inp_line
+    
+    if [[ -s /tmp/rusti_inp_line ]] ; then
+        rust_line=$(cat /tmp/rusti_inp_line)
+    else
+        echo ""
+        exit
+    fi
+}
+
+gist() {
+    #not tested!
+    cat <<EOF > /tmp/rusti_gist_file
+fn main() {
+    $old_stmts;
+    let line$i = {
+$rust_stmt
+    };
+    io::println(#fmt("line$i = %?", line$i));
+}
+EOF
+    sed -e "s/'/\\\\'/g; s/\\\\/\\\\\\\\/g" -i /tmp/rusti_gist_file
+
+    gist_body="{'description': ''; 'public': True;
+                'files': {'scratch.rs': {'content': $(cat /tmp/rusti_gist_file)}}}"
+    
+    curl --data-urlencode name@/tmp/rusti_gist --data-urlencode 
+}
+
+old_stmts=""
+
+for i in $(seq 99999); do
+
+    while true; do
+
+        rust_stmt=""
+        rust_line="";
+        get "rust" ""
+
+        while true; do
+            rust_stmt="$rust_stmt $rust_line"
+            stripped=$(echo "$rust_stmt" | sed -e 's/\\./XX/g; s/"[^"]*"//g')
+            opens=$(echo "$stripped" | sed -e 's/[^[({]//g')
+            closes=$(echo "$stripped" | sed -e 's/[^])}]//g')
+            unc=$(expr $(echo "$opens" | wc -m) - $(echo "$closes" | wc -m) )
+            
+            if [[ $unc = 0 ]]; then break; fi
+            
+            indent=""
+            for i in `seq $unc`; do indent="$indent    "; done
+
+            get '    ' "$indent"
+        done
+
+        $RUST_EXE - <<EOF -W no-path-statement -o /tmp/rusti_exec && break;
+fn main() {
+    $old_stmts;
+    let line$i = {
+$rust_stmt
+    };
+    io::println(#fmt("line$i = %?", line$i));
+}
+EOF
+    done
+
+    whole_output="$(/tmp/rusti_exec)"
+    running_output=${whole_output%line$i = *}
+    this_result=${whole_output#$running_output}
+    
+    this_output=${running_output#$old_output}
+
+    echo -ne '\033[1;34m'
+    echo -n "$this_output"
+    echo -ne '\033[0m'
+    echo "$this_result"
+
+    old_output="$old_output$this_output"
+
+    old_stmts="$old_stmts let line$i = { $rust_stmt }; line$i;"
+
+done
+
