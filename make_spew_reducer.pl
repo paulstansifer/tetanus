@@ -31,20 +31,15 @@ while (<>) {
     #compile error
     if (/^([^ ]*\D):\d.{0,26}(warning|error)/i) {
         $cont_line = $1;
-        $drop_chars = length $_;
-        s/^[^ ]*?rust/rust/;
-        $drop_chars -= length $_;
         print "\n$_"; next;
     }
     if ($cont_line and (/^\Q$cont_line\E/ or /^ *\^/)) {
-        print substr("$_", $drop_chars); next;
+        print $_; next;
     } else {
         $cont_line = 0;
     }
 
-    #tidy problems
-    if (/^IOError:/) { print "\n$_"; next; }
-    if (/trailing whitespace/) { s/^[^ ]*?rust/rust/; print "\n$_"; next; }
+    if (/^curl:.*failure/) { print "\n$_"; next; }
 
     #spanless errors
     if (/.{0,6}error:/) { print "\n$_"; next; }
@@ -73,6 +68,10 @@ while(<>) {
         print "\n$_" if (/[*][*][*]/);
         next;
     }
+
+    #tidy problems
+    if (/^IOError:/) { print "\n$_"; next; }
+    if (/trailing whitespace/) { print "\n$_"; next; }
 
     if (/^result:\s*([^.]+)\.\s*(\d+) passed; (\d+) failed; (\d+) ignored/) {
         print "[$1:$2/$3/$4]"; next;
