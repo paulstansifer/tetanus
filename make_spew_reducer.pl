@@ -40,6 +40,7 @@ while (<>) {
     }
 
     if (/^curl:.*failure/) { print "\n$_"; next; }
+    if (/^rustc:/) { print "\n$_"; next; }
 
     #spanless errors
     if (/.{0,6}error:/) { print "\n$_"; next; }
