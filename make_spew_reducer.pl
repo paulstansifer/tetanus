@@ -13,7 +13,7 @@ while (<>) {
     if (/^compiletime:/) { print "\n$_"; last; }
 
     #make
-    if (/^make:/) { 
+    if (/^make:/) {
         print "\n$_" if (/[*][*][*]/);
         next;
     }
@@ -55,17 +55,17 @@ $print_dashlines = 0;
 
 while(<>) {
     if (/^-{40}/) { $dashlines--; next; }
-    if ($dashlines >= 1) { 
+    if ($dashlines >= 1) {
         print if $print_dashlines;
         next;
     } else {
         $print_dashlines = 0;
     }
-    
+
     next if (/^\s*$/);
 
     #make
-    if (/^make:/) { 
+    if (/^make:/) {
         print "\n$_" if (/[*][*][*]/);
         next;
     }
@@ -73,6 +73,7 @@ while(<>) {
     #tidy problems
     if (/^IOError:/) { print "\n$_"; next; }
     if (/trailing whitespace/) { print "\n$_"; next; }
+    if (/line longer/) {print "\n$_"; next; }
 
     if (/^result:\s*([^.]+)\.\s*(\d+) passed; (\d+) failed; (\d+) ignored/) {
         print "[$1:$2/$3/$4]"; next;
