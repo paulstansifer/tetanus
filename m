@@ -11,6 +11,7 @@ make_args=
 maybe_check=true
 vrb=1
 tp=1
+dvg=1
 
 if [[ -e $(which notify-send) ]]; then
     notify=$(which notify-send)
@@ -25,6 +26,14 @@ while true; do
             gdb=1
             export CFG_ENABLE_DEBUG=1
             shift ;;
+        c1)
+            maybe_check="time -f testtime:%E make check-stage1"
+            shift ;;
+        c1=*)
+            maybe_check="time -f testtime:%E make check-stage1"
+            export TESTNAME=${1#c=}
+            echo "Only running tests with '$TESTNAME'."
+            shift ;;
         c | check)
             maybe_check="time -f testtime:%E make check"
             shift ;;
@@ -36,13 +45,16 @@ while true; do
         x)
             tp=
             shift ;;
+        v)
+            dvg=
+            shift ;;
         *)
             make_args+=" $1"
             shift ;;
     esac
 done
 
-export CFG_DISABLE_VALGRIND=1
+export CFG_DISABLE_VALGRIND=$dvg
 
 ((VERBOSE=1 TIME_PASSES=$tp time -f "compiletime:%E" make $make_args) && $maybe_check $make_args) 2>&1 | tee make_log | make_spew_reducer.pl | tee abbr_make_log
 
@@ -50,7 +62,7 @@ export CFG_DISABLE_VALGRIND=1
 if [[ $PIPESTATUS = 0 ]]; then
     $notify "\\o/" -- "$(tail -n7 abbr_make_log)"
 else
-    $notify "..." -- "$(tail -n7 abbr_make_log)" 
+    $notify "..." -- "$(tail -n7 abbr_make_log)"
     if [[ $gdb = 1 ]]; then
         gdb --args `egrep "stage./bin/rustc" make_log | tail -n1`
     fi

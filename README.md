@@ -1,4 +1,4 @@
-Tetanus is a collection of quick-and-dirty scripts to make developing (and 
+Tetanus is a collection of quick-and-dirty scripts to make developing (and
 perhaps even using) Rust easier.
 
 You'll want to make a file `~/.rust_build_dir` containing the name of your
@@ -7,7 +7,7 @@ build directory, and add the directory containing these files to your $PATH.
 
 Useful commands:
 
- * `m` / `m c` / `m c=my-test-name` / `m d` — make / make, with tests / make with specific tests / run `gdb` on failure
+ * `m` / `m c` / `m c=my-test-name` / `m d` / `m v` — make / make, with tests / make with specific tests / run `gdb` on failure / run Valgrind (Use `c1` to run stage1 tests instead.)
 
  * `. st 3` — use stage 3 binaries
 
