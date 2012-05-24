@@ -82,6 +82,18 @@ while(<>) {
         print "\n$_"; next;
     }
 
+    #compile error
+    if (/^([^ ]*\D):\d.{0,26}(warning|error)/i) {
+        $cont_line = $1;
+        print "\n$_"; next;
+    }
+    if ($cont_line and (/^\Q$cont_line\E/ or /^ *\^/)) {
+        print $_; next;
+    } else {
+        $cont_line = 0;
+    }
+
+
     #test errors
     if (/^error:/) {
         print "\n$_"; $prints = 1; next;
