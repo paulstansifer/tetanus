@@ -83,7 +83,7 @@ while(<>) {
     }
 
     #compile error
-    if (/^([^ ]*\D):\d.{0,26}(warning|error)/i) {
+    if (/^([^ ]*\D):\d.{0,26}(error)/i) {
         $cont_line = $1;
         print "\n$_"; next;
     }
