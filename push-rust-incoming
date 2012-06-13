@@ -1,9 +1,10 @@
 #!/bin/bash
-#
+#from Niko
 
 git diff --quiet HEAD
 if [[ "$?" != "0" ]]; then
     echo "Cannot push with uncommited changes."
     exit 1
 fi
-git push -f mozilla HEAD:try
+
+git push mozilla HEAD:incoming
