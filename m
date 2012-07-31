@@ -72,7 +72,7 @@ if [[ $PIPESTATUS = 0 ]]; then
 else
     $notify "..." -- "$(tail -n7 abbr_make_log)"
     if [[ $gdb = 1 ]]; then
-        gdb --args `egrep "stage./bin/rustc" make_log | tail -n1 | cut --delimiter="&" --fields=1`
+        gdb --args `egrep "stage./bin/rust" make_log | tail -n1 | cut --delimiter="&" --fields=1`
     fi
 fi
 
