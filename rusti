@@ -78,13 +78,13 @@ $rust_stmt
 }
 EOF
 
-        $RUST_EXE /tmp/rusti_src.rs -W no-path-statement -o /tmp/rusti_exec && break;
+        $RUST_EXE /tmp/rusti_src.rs -A path-statement -o /tmp/rusti_exec && break;
 
         echo "Rerun in GDB?"
         select yn in "yes" "no"; do
             case $yn in
                 yes )
-                    gdb --args $RUST_EXE /tmp/rusti_src.rs -W no-path-statement -o /tmp/rusti_exec
+                    gdb --args $RUST_EXE /tmp/rusti_src.rs -A path-statement -o /tmp/rusti_exec
                     break;;
                 no ) break;;
             esac
